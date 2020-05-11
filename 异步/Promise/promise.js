@@ -11,7 +11,7 @@ function Promise(fn) {
         if (that.status === PENDING) {
           that.status = RESOLVED
           that.result = value
-          that.rejectCallbacks.forEach(function (func) {
+          that.resolveCallbacks.forEach(function (func) {
             func(value);
           })
         }
@@ -32,7 +32,7 @@ function Promise(fn) {
     }
 }
 
-function handelValue(promise, val, resolve, reject) {
+function handelResolve(promise, val, resolve, reject) {
     if (promise === val) {
         return reject(new TypeError('循环引用'));
     }
@@ -42,14 +42,11 @@ function handelValue(promise, val, resolve, reject) {
         }, function (reason) {
             reject(reason)
         })
-    } else if (typeof val === 'object' && typeof val.then === 'function') {
-        let 
-
     } else {
         resolve(val)
     }
 }
-
+// 之前一直纠结返回promise怎么返，其实想一想新建一个就是new，既然要返回一个promise实例，那么就new 一个实例撒
 Promise.prototype.then = function (resolveFn, rejectFn) {
     resolveFn = typeof resolveFn === 'function'? resolveFn : function (value) {return value}
     rejectFn = typeof rejectFn === 'function' ? rejectFn : function (error) {throw error}
@@ -61,7 +58,7 @@ Promise.prototype.then = function (resolveFn, rejectFn) {
           setTimeout(function () {
             try {
               let value = resolveFn(that.result)
-              handelValue(_promise, value, resolve, reject)
+              handelResolve(_promise, value, resolve, reject)
             } catch (error) {
               reject(error)
             }
@@ -85,7 +82,7 @@ Promise.prototype.then = function (resolveFn, rejectFn) {
         setTimeout(function () {
           try {
             let value = resolveFn(that.result)
-            handelValue(_promise, value, resolve, reject)
+            handelResolve(_promise, value, resolve, reject)
           } catch (error) {
             reject(error)
           }
