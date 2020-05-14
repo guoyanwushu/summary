@@ -30,4 +30,4 @@
   可不可以去写一个工具, 扫描html的引入文件，自动在文件url后面添加唯一字符串，然后返回新的已经加了唯一字符串的文件.可以利用gulp的插件来实现对应功能
 
 #### 服务器的默认缓存策略？请求头的cache-control和响应头的cache-control有什么区别?f5和ctrl+f5的区别?
-
+* ctrl+f5会在请求头里加上cache-control: no-cache , 告诉服务器客户端不想使用本地缓存，如果之前的响应有返回etag或者last-modified，那么就会走协商缓存的路子，询问缓存是否可用，如果可用就是304，如果没有etag或者last-modified，那么就拿的是最新的内容
