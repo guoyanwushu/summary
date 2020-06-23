@@ -123,3 +123,5 @@ module.exports = {
 加到其他loader最前面就行了，效果和happypack差不多，配置更简单一些。这个和happypack都是并行执行加载器(loader)
 * parallel-webpack 
 并行执行整个webpack构建
+
+### dllPlugin
