@@ -89,13 +89,17 @@
 * 有用过node吗？比如用它写一些中间层
 
 ## vue
+* Watcher 到底是什么?和Dep的关系?有什么作用?
+* Dep又是什么?
+    Dep和data对象的属性一一对应，每一个data对象的属性(包括孙子属性)，都有一个对应的Dep对象，该属性所收集的所有依赖都保存在Dep对象的subs属性里面。 如何收集依赖? 依赖从何处来 ? 但从dep视角看，依赖都是从Dep.target来的，在收集依赖的时候
+    收集的也是Dep.target。 那么问题来了，Dep.target又是啥? Dep.target又是哪里来的呢?
 * vue中key的作用    
     1. 利用key规避diff时的最大化复用策略，使得前后dom更新时能够触发完整的生命周期并且能够触发过渡
     2. 同样是利用key，使得updateChildren的时候，在四轮首位对比均未命中的情况下可以更快定位到旧节点中的相同节点，间接的提升效率。
     可以看起来key的作用都是和dom复用有关的, 一方面是规避复用策略，一方面又是促进复用策略。
 * 可以将key设置为Math.random()随机数么
 
-    不能, 如果把key设置为Math.random(), 将会导致diff时，几乎无法复用旧的节点，每一次update都将会走remove和create的策略，真实dom的删除新增是代价非常大的，将会导致非常大的性能损失。
+    不能, 如果把key设置为Math.random(), 将会导致diff时，sameNode极大概率会判定失败，导致几乎无法复用旧的节点，每一次update都将会走remove和create的策略，真实dom的删除新增是代价非常大的，将会导致非常大的性能损失。
 * 如果让你设计一个双向绑定，会怎么设计
     先这样，再那样，再这样，最后那样，完成
 * 说一下Vue的diff算法，能不能描述一下vue的diff流程?
@@ -108,8 +112,9 @@
     事实上每一次diff都必须从根节点开始逐层对比，即便是完全静态的节点，也必须经过diff流程。可能一个vDom只有最后一个元素的一个文本引用了data数据，那么之前的所有diff都没有意义, 只有最后
     一个节点的diff是有意义的diff。vue3中，通过打标签的形式，在compiler生成vNode的时候加上patchFlags来标识动态节点，最终生成一个动态节点树，patch的时候不再进行整个vNode树对比，而只进行动态节点树对比，提高了diff效率。
 * Vue的双向绑定原理，Object.defineProperty()有什么缺点？Vue3为什么用Proxy?
-
-    通过Object.definProperyty劫持data对象属性的get和set，在get时收集依赖，set时触发更新,从而实现data更新时自动同步dom更新，双向绑定不过是响应输入事件更改data罢了。defineProperty有缺陷，无法识别到对象属性的新增删除和数组的直接索引变更以及length变更,而proxy原生支持。另外一方面Object.defineProperty是属性级别的劫持，必须遍历对象的每一个属性进行劫持，而proxy是对象级别的劫持，无须进行数学家别的深层次遍历
+    * 原理
+    递归遍历data对象，劫持其对象属性，重新定义get和set方法，通过get
+    defineProperty有缺陷，无法识别到对象属性的新增删除和数组的直接索引变更以及length变更,而proxy原生支持。另外一方面Object.defineProperty是属性级别的劫持，必须遍历对象的每一个属性进行劫持，而proxy是对象级别的劫持，无须进行数学家别的深层次遍历
 * nextTick实现原理
     向callbacks里添加一个处理函数。在当前的同步任务执行完成后，就会去callbacks里面取出来，挨个执行
 * nextTick中的waiting是什么时候变为true的呢    
@@ -145,6 +150,7 @@
             解决Object.defineProperyty 不能检测对象属性新增和删除，数组索引及length修改的响应式变化， 在对象级别建立监听而不用遍历递归在每一个属性上建立监听，效率大大提升
         * diff算法更新
         
+* 如果不用vuex，你有什么方案可以实现类似的功能么?
 * 谈一谈vuex的原理，有了解过其他的持久化方案么比如redux，说一下他们的区别
     vuex其实就是把需要持久化的数据提取到一个单独的vue实例中，然后通过berforeCreate钩子，在vue实例及子组件中注入$store属性指向该实例, vuex禁止直接修改state，只能通过commit mutation或者dispatch action 来进行数据变更，
 * 
