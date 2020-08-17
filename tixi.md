@@ -90,6 +90,18 @@
 
 ## vue
 * Watcher 到底是什么?和Dep的关系?有什么作用?
+    从名字差不多就能看出来，Watcher就是一个观察者，有自己的值(value), 保存有观察的对象 (expOrFn), 和观察的回调 (cb), 并且有自己的一些方法 (update\run\evalute), 同时也有一些自己的标识(dirty/lazy/等等). 通过new 注册一个观察者，然后new的过程中就会进行一次观察, 他自己在观察的时候同时会被被观察者进行收集(当你凝视深渊的时候，深渊也在凝视着你)。通过Watcher的初始化，被观察者自动收集了观察者，然后被观察者更新的时候，就会去通知观察者再次进行观察。
+
+
+    Watcher来源一共有三类 
+    1. renderWatcher 
+        在beforeMount执行后, 会新建一个render Watcher （vm._update(vm.render(), ), new的时候, watcher内部执行 this.get()的时候，会执行 vm._update(vm.render())， vm.render() 生成虚拟dom树的过程，实际上就完成
+    了依赖收集， 因为这个时候的Dep.target一直就是这个watcher，所以收集到的也全都是这个Watcher。 vm.render()执行完了之后， vm.update()执行，这个时候其实就是执行的mount, 虚拟dom到真实dom的映射过程了。new Watcher执行完了之后就会
+    调用 mounted 钩子.
+    2. computed
+        在initData 和 initProps initMethods 后，就会执行 initComputed, 通过watcher的dirty属性来控制缓存
+    3. $watch
+        
 * Dep又是什么?
     Dep和data对象的属性一一对应，每一个data对象的属性(包括孙子属性)，都有一个对应的Dep对象，该属性所收集的所有依赖都保存在Dep对象的subs属性里面。 如何收集依赖? 依赖从何处来 ? 但从dep视角看，依赖都是从Dep.target来的，在收集依赖的时候
     收集的也是Dep.target。 那么问题来了，Dep.target又是啥? Dep.target又是哪里来的呢?
@@ -151,8 +163,9 @@
         * diff算法更新
         
 * 如果不用vuex，你有什么方案可以实现类似的功能么?
+
 * 谈一谈vuex的原理，有了解过其他的持久化方案么比如redux，说一下他们的区别
-    vuex其实就是把需要持久化的数据提取到一个单独的vue实例中，然后通过berforeCreate钩子，在vue实例及子组件中注入$store属性指向该实例, vuex禁止直接修改state，只能通过commit mutation或者dispatch action 来进行数据变更，
+    vuex其实就是把需要持久化的数据提取到一个单独的vue实例中，然后通过berforeCreate钩子，在vue实例及子组件中注入$store属性指向该实例, vuex禁止直接修改state，只能通过commit mutation或者dispatch action 来进行数据变更
 * 
 
 ## 项目
