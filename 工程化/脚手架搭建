@@ -1,0 +1,39 @@
+通过命令行自动生成对应项目结构的模板，类似于vue-cli的功能! 
+
+主要思路: 
+* 用commander来处理命令行交互, 获取关于项目名等其他配置信息
+* 通过download-git-repo,下载目标项目代码到配置的文件夹中
+
+需要处理的一些问题:
+
+* 判定当前目录是否已存在指定的文件夹, 如果已存在不能直接替换，给出提示信息
+```
+    const fs = require('fs')
+    if (fs.existsSync(folderName)) {
+        // 已存在对应目录
+    }
+```
+* 判断当前脚手架版本是否和最新版本一致，如果不一致需要进行提醒
+```
+    const request = require('request')
+    const localVersion = require(../package.json)
+    // https://registry.npmjs.org/yingang-cli-test/latest 倒数第二个包名换成想访问的包名就可以了
+    request('https://registry.npmjs.org/yingang-cli-test/latest', function (err, response, body) {
+    if (!err && response.statusCode === 200) {
+      console.log(JSON.parse(body).version) // 获取服务器最新版本, 将本地版本和服务器版本对比
+    }
+  })
+```
+* 判断使用者的node版本和目标版本是否一致，低于目标版本的话提醒并中断进程
+```
+    function checkNodeVersion (wanted, id) {
+        if (!semver.satisfies(process.version, wanted)) {
+            console.log(chalk.red(
+            'You are using Node ' + process.version + ', but this version of ' + id +
+            ' requires Node ' + wanted + '.\nPlease upgrade your Node version.'
+            ))
+            process.exit(1)
+        }
+    }
+```
+* 根据用户的选择动态进行代码模块的新增和删除(类似于vue-cli的是否需要路由，是否需要vuex这种)

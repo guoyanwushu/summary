@@ -73,6 +73,69 @@
 
 2. 所以如果现在公司提出需要进行自动化构建，并且交给你来做，你有什么思路呢?
 
+* 根据项目结构区分使用哪种工具构建
+    传统的前后端不分离项目，功能都以html页面形式分割, 这种就不适合用webpack进行构建.单一入口，根据入口文件可递归索引到全部依赖的项目模型，就适合webpack进行构建。
+* 面临的问题
+    1. 路径问题
+        传统项目的页面，由于前后端不分离，依赖的路径都是以根目录为基路径。如果将前端部分进行分离构建，那么根目录索引会出错。
+        * html中的根依赖路径问题
+        * 通过require引进组件时的路径问题, 这个地方的路径又是根据require.config.js的_path来决定，而_path写死的是var _path = "http://" + window.location.host;如果不改的话， window.location取到的是前端服务的地址，而不是对应后端服务的地址，就会gg，找不到。
+
+        解决方案: 考虑不对原文件做任何变更的情况下，通过grunt插件，将html的依赖文件
+        ```
+        <link rel="stylesheet" href="/src/tywp.min.css">
+	    <script type="text/javascript" src="/src/bower_components/require/require.min.js"></script>
+	    <script type="text/javascript" src="/src/scripts/config/require.config.js"></script>
+        ```
+        进行一波替换, 将src="/" 替换为后台服务地址 src="http://localhost:8086/src/bower_components/require/require.min.js"
+        然后将 require.config.js 替换为本地的 _path已经修改过的require.config.js文件
+    2. 接口跨域问题
+    3. 热更新
+    4. 环境区分
+    5. 高级语法支持
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 * 权限判定方面也是有点问题的 ?
 只在菜单生成的时候根据用户角色权限动态生成，但是通过url地址访问的形式是可以绕过权限控制的。没有在按钮、接口层次上进行权限判定.
 
